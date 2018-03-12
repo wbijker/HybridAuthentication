@@ -10,9 +10,9 @@ using Microsoft.Extensions.Options;
 
 namespace Services.HybridAuthentication
 {
-    public class HybridAuthenticationHandler : AuthenticationHandler<HybridAuthenticationOptions>
+    public class HybridAuthenticationHandler : AuthenticationHandler<HybridAuthOptions>
     {
-        protected HybridAuthenticationHandler(IOptionsMonitor<HybridAuthenticationOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        protected HybridAuthenticationHandler(IOptionsMonitor<HybridAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
         }
 
