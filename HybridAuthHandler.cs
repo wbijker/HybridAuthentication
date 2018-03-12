@@ -1,5 +1,6 @@
 ﻿
 
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -68,7 +69,12 @@ namespace Services.HybridAuthentication
                 return Build(null, "No authorization token found");
             }
             
-            return Build(_manager.Find(token), "Token invalid");            
+            if (!token.StartsWith(Options.TokenType, StringComparison.OrdinalIgnoreCase)) 
+            {
+                return Build(null, "Invalid token type");
+            }
+            
+            return Build(_manager.Find(token.Substring(Options.TokenType.Length + 1)), "Token invalid");            
         }
     }
 }
