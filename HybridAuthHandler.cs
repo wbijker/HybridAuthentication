@@ -12,14 +12,17 @@ namespace Services.HybridAuthentication
 {
     public class HybridAuthenticationHandler : AuthenticationHandler<HybridAuthOptions>
     {
-        protected HybridAuthenticationHandler(IOptionsMonitor<HybridAuthOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        private HybridAuthManager _manager;
+
+        protected HybridAuthenticationHandler(IOptionsMonitor<HybridAuthOptions> options, HybridAuthManager manager, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
+            _manager = manager;
         }
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            // Create new authenticated user
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(new IdIdentity(11)), Options.Scheme);
+            var principal = _manager.SignIn(11, false);
+            var ticket = new AuthenticationTicket(principal, Options.Scheme);
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
     }

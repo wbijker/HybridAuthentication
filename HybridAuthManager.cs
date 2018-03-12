@@ -95,10 +95,14 @@ namespace Services.HybridAuthentication
             return null;
         }
 
-        public void SignIn(int id)
+        public ClaimsPrincipal SignIn(int id, bool httpContextSignIn = false)
         {
             var principal = new ClaimsPrincipal(new IdIdentity(id));
-            _context.HttpContext.SignInAsync(_options.Scheme, principal);
+            if (httpContextSignIn)
+            {
+                _context.HttpContext.SignInAsync(_options.Scheme, principal);
+            }
+            return principal;
         }
 
         private void AddTokenToCookie(HybridAuthToken token)
@@ -145,7 +149,7 @@ namespace Services.HybridAuthentication
             Add(ret);
 
             // 3. Set user as logged in
-            SignIn(id);
+            SignIn(id, true);
             return ret;
         }
     }
