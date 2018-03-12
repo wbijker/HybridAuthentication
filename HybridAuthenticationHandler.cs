@@ -19,9 +19,7 @@ namespace Services.HybridAuthentication
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             // Create new authenticated user
-            var identities = new List<ClaimsIdentity> {new ClaimsIdentity("HybridAuthenticationType")};
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identities), Options.Scheme);
-
+            var ticket = new AuthenticationTicket(new ClaimsPrincipal(new IdIdentity(11)), Options.Scheme);
             return Task.FromResult(AuthenticateResult.Success(ticket));
         }
     }
