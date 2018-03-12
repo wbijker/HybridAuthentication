@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -10,17 +11,17 @@ namespace Services.HybridAuthentication
     {
         private const string USERAGENT = "User-Agent";
 
-        private HybridAuthOptions _options;
+        public HybridAuthOptions _options;
         private IHttpContextAccessor _context;
         // Last Datetime when we performed a delete store operation
         // StoreDeleteInterval is part op HybridAuthOptions
         private static DateTime LastDeleted = DateTime.Now;
 
         
-        public HybridAuthManager(IOptions<HybridAuthOptions> options, IHttpContextAccessor httpContextAccessor)
+        public HybridAuthManager(IOptions<HybridAuthOptions> authOptions, IHttpContextAccessor httpContextAccessor)
         {
             _context = httpContextAccessor;
-            _options = options.Value;
+            _options = authOptions.Value;
         }
 
         private void DeleteExpired()
@@ -45,7 +46,7 @@ namespace Services.HybridAuthentication
             return Convert.ToBase64String(bytes);
         }
 
-        private bool Validate(HybridAuthToken token)
+        public bool Validate(HybridAuthToken token)
         {
             if (token == null)
             {
@@ -61,6 +62,12 @@ namespace Services.HybridAuthentication
             DeleteExpired();
             var data = _options.Store.GetByToken(token);
             return Validate(data) ? data : null;
+        }
+
+        public List<HybridAuthToken> FindByCookie(string cookie)
+        {
+            DeleteExpired();
+            return _options.Store.GetByCookie(cookie);
         }
 
         public void Add(HybridAuthToken token)

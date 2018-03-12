@@ -14,9 +14,9 @@ namespace Services.HybridAuthentication
 
         #region TokenOptions
         // The HTTP header to look for the token
-        public string Header { get; set; } = "Authorization";
+        public string TokenHeader { get; set; } = "Authorization";
         // Authenticatin header prefix
-        public string Type { get; set; } = "Berear";
+        public string TokenType { get; set; } = "Bearer";
     
         #endregion
 
