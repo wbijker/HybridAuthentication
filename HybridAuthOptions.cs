@@ -22,7 +22,8 @@ namespace Services.HybridAuthentication
 
         #region CookieOptions
         public string Path { get; set; }
-        public string CookieName { get; set; }
+        // Service Set IDentitifer or also referenced as Secure Session IDentifier
+        public string CookieName { get; set; } = "SSID";
         public string Domain { get; set; }
             
         #endregion
@@ -41,6 +42,6 @@ namespace Services.HybridAuthentication
         public bool OnlyHTTPS { get; set; } = false;
 
         // The length of the generated random string in tokens and cookie values's
-        public int Length { get; set; } = 128;
+        public int TokenLength { get; set; } = 128;
     }
 }
