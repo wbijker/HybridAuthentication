@@ -12,23 +12,26 @@ using Microsoft.Extensions.Options;
 
 namespace Services.HybridAuthentication
 {
-    public class HybridAuthenticationHandler : AuthenticationHandler<HybridAuthOptions>
+    public class HybridAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         private HybridAuthManager _manager;
+        private HybridAuthOptions _authOptions;
 
         public HybridAuthenticationHandler(
-            IOptionsMonitor<HybridAuthOptions> options, 
+            IOptionsMonitor<AuthenticationSchemeOptions> options,
+            IOptions<HybridAuthOptions> authOptions,
             HybridAuthManager manager, 
             ILoggerFactory logger,
             UrlEncoder encoder, 
             ISystemClock clock) : base(options, logger, encoder, clock)
         {
             _manager = manager;
+            _authOptions = authOptions.Value;
         }
 
         private string GetFirstHeader(string name, string defaultValue)
         {
-            if (Request.Headers.TryGetValue(Options.TokenHeader, out var value) && value.Count == 1)
+            if (Request.Headers.TryGetValue(_authOptions.TokenHeader, out var value) && value.Count == 1)
             {
                 return value.ToArray()[0];
             }
@@ -54,8 +57,8 @@ namespace Services.HybridAuthentication
 
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            var token = GetFirstHeader(Options.TokenHeader, null);
-            var cookie = Request.Cookies[Options.CookieName];
+            var token = GetFirstHeader(_authOptions.TokenHeader, null);
+            var cookie = Request.Cookies[_authOptions.CookieName];
 
             // If token is absent and cookie is avaialbe
             // todo: add restriction to the page where this is allowed
@@ -69,12 +72,12 @@ namespace Services.HybridAuthentication
                 return Build(null, "No authorization token found");
             }
             
-            if (!token.StartsWith(Options.TokenType, StringComparison.OrdinalIgnoreCase)) 
+            if (!token.StartsWith(_authOptions.TokenType, StringComparison.OrdinalIgnoreCase)) 
             {
                 return Build(null, "Invalid token type");
             }
             
-            return Build(_manager.Find(token.Substring(Options.TokenType.Length + 1)), "Token invalid");            
+            return Build(_manager.Find(token.Substring(_authOptions.TokenType.Length + 1)), "Token invalid");            
         }
     }
 }

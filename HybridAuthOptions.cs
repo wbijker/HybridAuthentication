@@ -6,11 +6,16 @@ namespace Services.HybridAuthentication
     
     public class HybridAuthOptions: AuthenticationSchemeOptions
     {
+        public HybridAuthOptions()
+        {
+            Console.WriteLine("New HybridAuthOptions has been created");
+        }
+        
         public const string DefaultScheme = "HybridAuthentication";
         public string Scheme => DefaultScheme;
 
         // Allow user override the default inMemory store
-        public IHybridAuthStore Store { get; set; }
+        public IHybridAuthStore Store { get; set; } = new HybridAuthMemoryStore();
 
         #region TokenOptions
         // The HTTP header to look for the token

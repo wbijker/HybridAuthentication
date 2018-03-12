@@ -16,13 +16,32 @@ namespace Services.HybridAuthentication
 {
     public static class AuthenticationDIExtensions
     {
-        public static void AddHybridAuthentication<T, P>(this IServiceCollection services, Action<HybridAuthOptions> options) 
-            where P: class, IPopulater<T> where T: class, new()
+
+        public class HybridAuthenticationBuilder<T>
+        {
+            private IServiceCollection _service;
+            public HybridAuthenticationBuilder(IServiceCollection service)
+            {
+                _service = service;
+            }
+
+            public HybridAuthenticationBuilder<T> RegisterPopulator<P>() where P: class, IPopulater<T>
+            {
+                _service.AddScoped<IPopulater<T>, P>();
+                return this;
+            }
+
+            public HybridAuthenticationBuilder<T> RegisterStore<P>() where P:class, IHybridAuthStore
+            {
+                _service.AddScoped<IHybridAuthStore, P>();
+                return this;
+            }
+        }
+
+        public static HybridAuthenticationBuilder<T> AddHybridAuthentication<T>(this IServiceCollection services, Action<HybridAuthOptions> options) where T: class, new()
         {
             // Make sure HttpContextAccessor is registered
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();   
-            // Register populator class to populate a new T from id
-            services.AddScoped<IPopulater<T>, P>();
             
             services.AddTransient<T>((IServiceProvider prov) => {
                 // Ger various servies
@@ -39,15 +58,15 @@ namespace Services.HybridAuthentication
                 // It will result in unable to resolve service for .. while activating ...
                 return new T();
             });
-
             
             services.Configure<HybridAuthOptions>(options);
             services.AddScoped<HybridAuthManager>();
-
             services.AddAuthentication(configureOptions => {
                 configureOptions.DefaultAuthenticateScheme = HybridAuthOptions.DefaultScheme;
                 configureOptions.DefaultChallengeScheme = HybridAuthOptions.DefaultScheme;
-            }).AddHybridAuth(options);
+            }).AddHybridAuth();
+
+            return new HybridAuthenticationBuilder<T>(services);
         }
     }
 }
