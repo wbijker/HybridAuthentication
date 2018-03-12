@@ -59,7 +59,7 @@ namespace Services.HybridAuthentication
 
             // If token is absent and cookie is avaialbe
             // todo: add restriction to the page where this is allowed
-            if (string.IsNullOrEmpty(token) && string.IsNullOrEmpty(cookie))
+            if (string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(cookie))
             {
                 return Build(ByCookie(cookie), "Cookie invalid");
             }

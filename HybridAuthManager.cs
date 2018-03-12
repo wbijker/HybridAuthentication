@@ -22,6 +22,12 @@ namespace Services.HybridAuthentication
         {
             _context = httpContextAccessor;
             _options = authOptions.Value;
+
+            // Create default Memory store if none was provided
+            if (_options.Store == null)
+            {
+                _options.Store = new HybridAuthMemoryStore();
+            }
         }
 
         private void DeleteExpired()
